@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>10-Ruby · Class Website</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink:   #ad1457;
+      --pink2:  #e91e8c;
+      --purple: #7b1fa2;
+      --deep:   #4a148c;
+      --light:  #fce4ec;
+      --mid:    #f8bbd0;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 30%, #e1bee7 60%, #c5cae9 100%);
+      min-height: 100vh;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 32px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(14px);
+      border-bottom: 2px solid rgba(255,255,255,0.8);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.3rem;
+      color: var(--pink);
+      text-shadow: 1px 1px 0 #f48fb1;
+    }
+
+    .nav-links a {
+      font-weight: 800;
+      font-size: 0.85rem;
+      color: var(--deep);
+      text-decoration: none;
+      margin-left: 22px;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--pink2); }
+    .nav-links a.active { color: var(--pink); border-bottom: 2px solid var(--pink); }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 70px 24px 50px;
+      position: relative;
+    }
+
+    .hero-emoji {
+      font-size: 2rem;
+      letter-spacing: 8px;
+      margin-bottom: 16px;
+      display: block;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-8px); }
+    }
+
+    .hero h1 {
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(2.2rem, 6vw, 3.5rem);
+      color: var(--pink);
+      text-shadow: 3px 3px 0 #f48fb1;
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      font-size: 1rem;
+      color: var(--pink);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .hero .sub {
+      font-size: 0.85rem;
+      color: #880e4f;
+      font-weight: 600;
+      margin-bottom: 40px;
+    }
+
+    /* CARDS GRID */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 22px;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+    }
+
+    .page-card {
+      background: rgba(255,255,255,0.82);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      padding: 30px 24px;
+      border: 2px solid rgba(255,255,255,0.9);
+      box-shadow: 0 10px 30px rgba(173,20,87,0.13);
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+
+    .page-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 40px rgba(173,20,87,0.22);
+    }
+
+    .page-card .icon {
+      font-size: 2.8rem;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .page-card h3 {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.2rem;
+      color: var(--pink);
+      margin-bottom: 10px;
+    }
+
+    .page-card p {
+      font-size: 0.85rem;
+      color: #6a1b9a;
+      font-weight: 600;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .page-card .btn {
+      background: linear-gradient(135deg, var(--pink2), var(--pink));
+      color: white;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 0.85rem;
+      border: none;
+      border-radius: 30px;
+      padding: 9px 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(173,20,87,0.3);
+      transition: transform 0.15s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .page-card .btn:hover { transform: scale(1.05); }
+    .page-card .btn.purple {
+      background: linear-gradient(135deg, #9c27b0, var(--deep));
+      box-shadow: 0 4px 14px rgba(74,20,140,0.3);
+    }
+    .page-card .btn.teal {
+      background: linear-gradient(135deg, #00897b, #004d40);
+      box-shadow: 0 4px 14px rgba(0,77,64,0.3);
+    }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 22px;
+      font-size: 0.8rem;
+      color: #880e4f;
+      font-weight: 700;
+      background: rgba(255,255,255,0.4);
+      backdrop-filter: blur(8px);
+      border-top: 2px solid rgba(255,255,255,0.7);
+    }
+
+    /* decorative blobs */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.25;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .blob1 { width: 320px; height: 320px; background: #e91e8c; top: -80px; left: -80px; }
+    .blob2 { width: 280px; height: 280px; background: #7b1fa2; bottom: -60px; right: -60px; }
+  </style>
+</head>
+<body>
+
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+
+<nav>
+  <span class="nav-brand">10-Ruby 🌸</span>
+  <div class="nav-links">
+    <a href="index.html" class="active">Home</a>
+    <a href="classmates.html">Classmates</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="gallery.html">Gallery</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <span class="hero-emoji">🌸 ✨ 🎀 ✨ 🌸</span>
+  <h1>Welcome to 10-Ruby!</h1>
+  <p>Professional High School · Fourth Quarter AY 2025–2026</p>
+  <p class="sub">ICT 10 Project · Gill, Sarveen &amp; Ignacio, Sasha</p>
+</div>
+
+<div class="cards">
+  <a class="page-card" href="classmates.html">
+    <span class="icon">👩‍👧‍👦</span>
+    <h3>Classmates</h3>
+    <p>Meet everyone in 10-Ruby! Add new classmates and browse the full list with their favorite subjects.</p>
+    <span class="btn">View List</span>
+  </a>
+
+  <a class="page-card" href="attendance.html">
+    <span class="icon">📋</span>
+    <h3>Attendance</h3>
+    <p>Track weekly absences for our class. Log daily counts and visualize the data with a live graph.</p>
+    <span class="btn purple">Track Now</span>
+  </a>
+
+  <a class="page-card" href="gallery.html">
+    <span class="icon">📸</span>
+    <h3>Gallery</h3>
+    <p>Highlights of our class activities — field trips, science fairs, sports days, and more memories!</p>
+    <span class="btn teal">View Photos</span>
+  </a>
+</div>
+
+<footer>© 2025–2026 10-Ruby · All rights reserved 🎀</footer>
+
+</body>
+</html>

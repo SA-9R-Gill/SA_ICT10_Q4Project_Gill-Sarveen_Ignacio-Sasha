@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Attendance Tracker – 10-Ruby</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 30%, #e1bee7 60%, #c5cae9 100%);
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 32px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(14px);
+      border-bottom: 2px solid rgba(255,255,255,0.8);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.3rem;
+      color: #ad1457;
+      text-shadow: 1px 1px 0 #f48fb1;
+    }
+
+    .nav-links a {
+      font-weight: 800;
+      font-size: 0.85rem;
+      color: #4a148c;
+      text-decoration: none;
+      margin-left: 22px;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: #e91e8c; }
+    .nav-links a.active { color: #ad1457; border-bottom: 2px solid #ad1457; padding-bottom: 2px; }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 30px 16px 40px;
+    }
+
+    header { text-align: center; margin-bottom: 28px; }
+
+    header h1 {
+      font-family: 'Pacifico', cursive;
+      font-size: 2rem;
+      color: #ad1457;
+      text-shadow: 2px 2px 0 #f48fb1;
+      margin-bottom: 4px;
+    }
+
+    header p { font-size: 0.9rem; color: #880e4f; font-weight: 600; }
+
+    .emoji-row { text-align: center; font-size: 1.3rem; margin-bottom: 6px; letter-spacing: 4px; }
+
+    .card {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(173,20,87,0.12);
+      border: 2px solid rgba(255,255,255,0.9);
+    }
+
+    .card h2 { font-size: 1rem; font-weight: 800; color: #ad1457; margin-bottom: 14px; }
+
+    .input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+
+    input[type="number"], select {
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 10px 14px;
+      border: 2px solid #f48fb1;
+      border-radius: 12px;
+      outline: none;
+      background: #fff0f5;
+      color: #4a148c;
+      transition: border 0.2s;
+      width: 100%;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="number"]:focus, select:focus { border-color: #ad1457; background: #fff; }
+    input[type="number"]::placeholder { color: #ce93d8; font-weight: 600; }
+
+    .select-wrapper { position: relative; }
+    .select-wrapper::after {
+      content: "▾";
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #e91e8c;
+      font-size: 1rem;
+      pointer-events: none;
+    }
+
+    .btn-row { display: flex; gap: 10px; }
+
+    button {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 0;
+      cursor: pointer;
+      flex: 1;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    button:active { transform: scale(0.97); }
+
+    .btn-add {
+      background: linear-gradient(135deg, #e91e8c, #ad1457);
+      color: white;
+      box-shadow: 0 4px 14px rgba(173,20,87,0.35);
+    }
+
+    .btn-reset {
+      background: linear-gradient(135deg, #7b1fa2, #4a148c);
+      color: white;
+      box-shadow: 0 4px 14px rgba(74,20,140,0.35);
+    }
+
+    button:hover { transform: translateY(-2px); }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .day-chip {
+      background: linear-gradient(135deg, #fce4ec, #ede7f6);
+      border-radius: 14px;
+      padding: 10px 6px;
+      text-align: center;
+      border-left: 4px solid #e91e8c;
+      font-size: 0.78rem;
+      color: #4a148c;
+      font-weight: 700;
+      animation: popIn 0.3s ease;
+    }
+
+    .day-chip .day-label { font-size: 0.68rem; color: #ad1457; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+    .day-chip .day-val { font-size: 1.4rem; font-weight: 900; color: #4a148c; line-height: 1.2; }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .chart-card {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(173,20,87,0.12);
+      border: 2px solid rgba(255,255,255,0.9);
+    }
+
+    .chart-card h2 { font-size: 1rem; font-weight: 800; color: #7b1fa2; margin-bottom: 14px; }
+
+    canvas { width: 100% !important; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #ad1457;
+      color: white;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+      z-index: 999;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    label { font-size: 0.82rem; font-weight: 800; color: #880e4f; margin-bottom: 2px; display: block; }
+
+    footer { text-align: center; padding: 22px; font-size: 0.8rem; color: #880e4f; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">10-Ruby 🌸</span>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="classmates.html">Classmates</a>
+    <a href="attendance.html" class="active">Attendance</a>
+    <a href="gallery.html">Gallery</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <header>
+    <div class="emoji-row">🌸 ✨ 🎀 ✨ 🌸</div>
+    <h1>Attendance Tracker</h1>
+    <p>Gill, Sarveen · Ignacio, Sasha</p>
+  </header>
+
+  <div class="card">
+    <h2>Log Absences</h2>
+    <div class="input-group">
+      <div>
+        <label>Select Day</label>
+        <div class="select-wrapper">
+          <select id="inputDay">
+            <option value="">-- Choose a day --</option>
+            <option value="0">Monday</option>
+            <option value="1">Tuesday</option>
+            <option value="2">Wednesday</option>
+            <option value="3">Thursday</option>
+            <option value="4">Friday</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label>Number of Absences</label>
+        <input type="number" id="inputAbsences" placeholder="e.g. 3" min="0" max="50" />
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-add"   onclick="submitAbsence()">Submit</button>
+      <button class="btn-reset" onclick="resetAll()">Reset</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Weekly Summary</h2>
+    <div class="summary-grid" id="summaryGrid"></div>
+  </div>
+
+  <div class="chart-card">
+    <h2>Weekly Attendance Graph</h2>
+    <canvas id="attendanceChart" height="220"></canvas>
+  </div>
+
+</div>
+
+<footer>© 2025–2026 10-Ruby · All rights reserved 🎀</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+  let absences = [1, 0, 5, 0, 3];
+
+  const ctx = document.getElementById("attendanceChart").getContext("2d");
+  const chart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: DAYS,
+      datasets: [{
+        label: "Number of Absences",
+        data: [...absences],
+        borderColor: "#1565c0",
+        backgroundColor: "rgba(21,101,192,0.08)",
+        pointBackgroundColor: "#1565c0",
+        pointRadius: 6,
+        pointHoverRadius: 8,
+        tension: 0,
+        spanGaps: false,
+        borderWidth: 2,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true,
+      animation: { duration: 600 },
+      plugins: {
+        legend: { display: false },
+        title: {
+          display: true,
+          text: "Weekly Attendance (Absences)",
+          font: { family: "Nunito", size: 13, weight: "800" },
+          color: "#4a148c",
+          padding: { bottom: 10 }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: "Day", font: { family: "Nunito", size: 11, weight: "700" }, color: "#880e4f" },
+          ticks: { font: { family: "Nunito", size: 11 }, color: "#4a148c" },
+          grid: { color: "rgba(173,20,87,0.08)" }
+        },
+        y: {
+          beginAtZero: true,
+          title: { display: true, text: "Number of Absences", font: { family: "Nunito", size: 11, weight: "700" }, color: "#880e4f" },
+          ticks: { font: { family: "Nunito", size: 11 }, color: "#4a148c", stepSize: 1, precision: 0 },
+          grid: { color: "rgba(173,20,87,0.08)" }
+        }
+      }
+    }
+  });
+
+  function displayGraph() { chart.data.datasets[0].data = [...absences]; chart.update(); }
+
+  function renderSummary() {
+    const grid = document.getElementById("summaryGrid");
+    grid.innerHTML = "";
+    DAYS.forEach((day, i) => {
+      const chip = document.createElement("div");
+      chip.className = "day-chip";
+      chip.innerHTML = `<div class="day-label">${day.slice(0,3)}</div><div class="day-val">${absences[i]}</div>`;
+      grid.appendChild(chip);
+    });
+  }
+
+  function submitAbsence() {
+    const dayIdx = document.getElementById("inputDay").value;
+    const absVal = document.getElementById("inputAbsences").value.trim();
+    if (dayIdx === "") { showToast("Please select a day! 🌸"); return; }
+    if (absVal === "" || isNaN(absVal) || Number(absVal) < 0) { showToast("Please enter a valid number! ✨"); return; }
+    absences[parseInt(dayIdx)] = parseInt(absVal);
+    document.getElementById("inputDay").value = "";
+    document.getElementById("inputAbsences").value = "";
+    showToast(`${DAYS[dayIdx]}: ${absVal} absence(s) logged! 🎀`);
+    renderSummary();
+    displayGraph();
+  }
+
+  function resetAll() {
+    absences = [1, 0, 5, 0, 3];
+    renderSummary(); displayGraph();
+    showToast("Data restored! 🌸");
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById("toast");
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2500);
+  }
+
+  renderSummary();
+  displayGraph();
+</script>
+</body>
+</html>

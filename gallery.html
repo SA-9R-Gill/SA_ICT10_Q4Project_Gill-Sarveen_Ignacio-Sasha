@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gallery – 10-Ruby</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 30%, #e1bee7 60%, #c5cae9 100%);
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 32px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(14px);
+      border-bottom: 2px solid rgba(255,255,255,0.8);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.3rem;
+      color: #ad1457;
+      text-shadow: 1px 1px 0 #f48fb1;
+    }
+
+    .nav-links a {
+      font-weight: 800;
+      font-size: 0.85rem;
+      color: #4a148c;
+      text-decoration: none;
+      margin-left: 22px;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: #e91e8c; }
+    .nav-links a.active { color: #ad1457; border-bottom: 2px solid #ad1457; padding-bottom: 2px; }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 30px 20px 50px;
+    }
+
+    header { text-align: center; margin-bottom: 34px; }
+
+    header h1 {
+      font-family: 'Pacifico', cursive;
+      font-size: 2rem;
+      color: #ad1457;
+      text-shadow: 2px 2px 0 #f48fb1;
+      margin-bottom: 6px;
+    }
+
+    header p { font-size: 0.9rem; color: #880e4f; font-weight: 600; }
+
+    .emoji-row { text-align: center; font-size: 1.3rem; margin-bottom: 8px; letter-spacing: 4px; }
+
+    /* Filter Buttons */
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .filter-btn {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 0.8rem;
+      border: 2px solid #f48fb1;
+      border-radius: 30px;
+      padding: 7px 18px;
+      cursor: pointer;
+      background: rgba(255,255,255,0.75);
+      color: #4a148c;
+      transition: all 0.2s;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: linear-gradient(135deg, #e91e8c, #ad1457);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(173,20,87,0.3);
+    }
+
+    /* Photo Grid */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .photo-card {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(173,20,87,0.12);
+      border: 2px solid rgba(255,255,255,0.9);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      animation: popIn 0.4s ease both;
+    }
+
+    .photo-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 16px 36px rgba(173,20,87,0.2);
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Color placeholder fallback */
+    .photo-placeholder {
+      width: 100%;
+      height: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      font-weight: 900;
+    }
+
+    .photo-info {
+      padding: 12px 14px 14px;
+    }
+
+    .photo-info .tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: #ad1457;
+      background: #fce4ec;
+      border-radius: 20px;
+      padding: 2px 10px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .photo-info h3 {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #4a148c;
+      margin-bottom: 4px;
+    }
+
+    .photo-info p {
+      font-size: 0.78rem;
+      color: #880e4f;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    /* Lightbox */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(74,20,140,0.85);
+      backdrop-filter: blur(10px);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .lightbox.open { display: flex; }
+
+    .lightbox-inner {
+      background: rgba(255,255,255,0.95);
+      border-radius: 24px;
+      max-width: 520px;
+      width: 100%;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+      animation: popIn 0.3s ease;
+    }
+
+    .lightbox-inner .photo-placeholder,
+    .lightbox-inner img {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+    }
+
+    .lightbox-body { padding: 20px 24px 24px; }
+    .lightbox-body h3 { font-family: 'Pacifico', cursive; color: #ad1457; font-size: 1.2rem; margin-bottom: 8px; }
+    .lightbox-body p { font-size: 0.9rem; color: #4a148c; font-weight: 600; line-height: 1.5; margin-bottom: 16px; }
+
+    .close-btn {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      background: linear-gradient(135deg, #e91e8c, #ad1457);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 9px 24px;
+      cursor: pointer;
+      font-size: 0.88rem;
+    }
+
+    footer { text-align: center; padding: 22px; font-size: 0.8rem; color: #880e4f; font-weight: 700; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">10-Ruby 🌸</span>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="classmates.html">Classmates</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="gallery.html" class="active">Gallery</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <header>
+    <div class="emoji-row">📸 ✨ 🎀 ✨ 📸</div>
+    <h1>Class Highlights</h1>
+    <p>Memories from our 10-Ruby journey · AY 2025–2026</p>
+  </header>
+
+  <div class="filters">
+    <button class="filter-btn active" onclick="filterPhotos('all', this)">All 🌸</button>
+    <button class="filter-btn" onclick="filterPhotos('field-trip', this)">Field Trips 🏕️</button>
+    <button class="filter-btn" onclick="filterPhotos('sports', this)">Sports 🏀</button>
+    <button class="filter-btn" onclick="filterPhotos('science', this)">Science 🔬</button>
+    <button class="filter-btn" onclick="filterPhotos('arts', this)">Arts & Music 🎨</button>
+    <button class="filter-btn" onclick="filterPhotos('events', this)">Events 🎉</button>
+  </div>
+
+  <div class="gallery-grid" id="galleryGrid"></div>
+
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-inner" id="lightboxInner">
+    <div class="photo-placeholder" id="lbPlaceholder"></div>
+    <div class="lightbox-body">
+      <h3 id="lbTitle"></h3>
+      <p id="lbDesc"></p>
+      <button class="close-btn" onclick="document.getElementById('lightbox').classList.remove('open')">Close ✨</button>
+    </div>
+  </div>
+</div>
+
+<footer>© 2025–2026 10-Ruby · All rights reserved 🎀</footer>
+
+<script>
+  // Photo data — replace src values with your actual image paths when you have real photos!
+  // e.g., src: "photos/nature_trail.jpg"
+  const photos = [
+    {
+      id: 1, category: "field-trip",
+      title: "Camping",
+      caption: "We took care of the younger kids and had an overnight camp.",
+      src: "https://placehold.co/400x300/a5d6a7/1b5e20?text=Nature+Trail"
+    },
+    {
+      id: 2, category: "sports",
+      title: "Intrams",
+      caption: "10-Ruby's lat year in O.B. as Yellow Tigers.",
+      src: "intrams.heic"
+    },
+    {
+      id: 3, category: "events",
+      title: "Food Fair",
+      caption: "We were all sold out!",
+      src: "foodfair.heic"
+    },
+    {
+      id: 4, category: "events",
+      title: "CAT Graduation",
+      caption: "When we paraded and finished CAT.",
+      src: "CAT.heic"
+    },
+    {
+      id: 5, category: "events",
+      title: "Christmas Party",
+      caption: "Our final christmas party in OB.",
+      src: "christmas.heic"
+    },
+    {
+      id: 6, category: "events",
+      title: "Last day of School",
+      caption: "Last ever day as 10-Ruby!",
+      src: "lastday.jpg"
+    },
+    {
+      id: 7, category: "arts",
+      title: "Sabyang Pagbikas",
+      caption: "Sabayang Pagbikas in Filipino class — we had so much fun performing our poem!",
+      src: "fil.heic"
+    },
+    {
+      id: 8, category: "science",
+      title: "Last Science lab",
+      caption: "Our last science lab in OB — we had so much fun doing the experiments and learning together!",
+      src: "lab.jpeg"
+    },
+  ];
+
+  let currentFilter = "all";
+
+  function buildCard(photo, index) {
+    const card = document.createElement("div");
+    card.className = "photo-card";
+    card.dataset.category = photo.category;
+    card.style.animationDelay = `${index * 0.05}s`;
+    card.onclick = () => openLightbox(photo);
+
+    const visual = `<img src="${photo.src}" alt="${photo.title}" loading="lazy">`;
+
+    const tagLabel = {
+      "field-trip": "Field Trip 🏕️",
+      "sports": "Sports 🏀",
+      "science": "Science 🔬",
+      "arts": "Arts & Music 🎨",
+      "events": "Events 🎉"
+    }[photo.category] || photo.category;
+
+    card.innerHTML = `
+      ${visual}
+      <div class="photo-info">
+        <span class="tag">${tagLabel}</span>
+        <h3>${photo.title}</h3>
+        <p>${photo.caption}</p>
+      </div>
+    `;
+    return card;
+  }
+
+  function renderGallery(filter = "all") {
+    const grid = document.getElementById("galleryGrid");
+    grid.innerHTML = "";
+    const filtered = filter === "all" ? photos : photos.filter(p => p.category === filter);
+    filtered.forEach((photo, i) => grid.appendChild(buildCard(photo, i)));
+  }
+
+  function filterPhotos(category, btn) {
+    currentFilter = category;
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    renderGallery(category);
+  }
+
+  function openLightbox(photo) {
+    const lb = document.getElementById("lbPlaceholder");
+    lb.style.background = "";
+    lb.innerHTML = `<img src="${photo.src}" alt="${photo.title}" style="width:100%;height:260px;object-fit:cover;display:block;">`;
+    document.getElementById("lbTitle").textContent = photo.title;
+    document.getElementById("lbDesc").textContent = photo.caption;
+    document.getElementById("lightbox").classList.add("open");
+  }
+
+  function closeLightbox(e) {
+    if (e.target === document.getElementById("lightbox")) {
+      document.getElementById("lightbox").classList.remove("open");
+    }
+  }
+
+  renderGallery();
+</script>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Classmates – 10-Ruby</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 30%, #e1bee7 60%, #c5cae9 100%);
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 32px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(14px);
+      border-bottom: 2px solid rgba(255,255,255,0.8);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.3rem;
+      color: #ad1457;
+      text-shadow: 1px 1px 0 #f48fb1;
+    }
+
+    .nav-links a {
+      font-weight: 800;
+      font-size: 0.85rem;
+      color: #4a148c;
+      text-decoration: none;
+      margin-left: 22px;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: #e91e8c; }
+    .nav-links a.active { color: #ad1457; border-bottom: 2px solid #ad1457; padding-bottom: 2px; }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 30px 16px 40px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    header h1 {
+      font-family: 'Pacifico', cursive;
+      font-size: 2rem;
+      color: #ad1457;
+      text-shadow: 2px 2px 0 #f48fb1;
+      margin-bottom: 4px;
+    }
+
+    header p {
+      font-size: 0.9rem;
+      color: #880e4f;
+      font-weight: 600;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(173,20,87,0.12);
+      border: 2px solid rgba(255,255,255,0.9);
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #ad1457;
+      margin-bottom: 14px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .name-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .name-row input { flex: 1; }
+
+    input, select {
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 10px 14px;
+      border: 2px solid #f48fb1;
+      border-radius: 12px;
+      outline: none;
+      background: #fff0f5;
+      color: #4a148c;
+      transition: border 0.2s;
+      width: 100%;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    input:focus, select:focus { border-color: #ad1457; background: #fff; }
+    input::placeholder { color: #ce93d8; font-weight: 600; }
+
+    .select-wrapper { position: relative; }
+    .select-wrapper::after {
+      content: "▾";
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #e91e8c;
+      font-size: 1rem;
+      pointer-events: none;
+    }
+
+    .btn-row { display: flex; gap: 10px; }
+
+    button {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 0;
+      cursor: pointer;
+      flex: 1;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    button:active { transform: scale(0.97); }
+
+    .btn-add {
+      background: linear-gradient(135deg, #e91e8c, #ad1457);
+      color: white;
+      box-shadow: 0 4px 14px rgba(173,20,87,0.35);
+    }
+
+    .btn-show {
+      background: linear-gradient(135deg, #7b1fa2, #4a148c);
+      color: white;
+      box-shadow: 0 4px 14px rgba(74,20,140,0.35);
+    }
+
+    button:hover { transform: translateY(-2px); }
+
+    .list-card {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 8px 24px rgba(173,20,87,0.12);
+      border: 2px solid rgba(255,255,255,0.9);
+    }
+
+    .list-card h2 { font-size: 1rem; font-weight: 800; color: #7b1fa2; margin-bottom: 14px; }
+
+    .classmate-item {
+      background: linear-gradient(135deg, #fce4ec, #ede7f6);
+      border-radius: 14px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      border-left: 4px solid #e91e8c;
+      font-size: 0.88rem;
+      color: #4a148c;
+      font-weight: 600;
+      line-height: 1.5;
+      animation: popIn 0.3s ease;
+    }
+
+    .classmate-item:last-child { margin-bottom: 0; }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #ad1457;
+      color: white;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+      z-index: 999;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    .emoji-row { text-align: center; font-size: 1.3rem; margin-bottom: 6px; letter-spacing: 4px; }
+
+    footer {
+      text-align: center;
+      padding: 22px;
+      font-size: 0.8rem;
+      color: #880e4f;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">10-Ruby 🌸</span>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="classmates.html" class="active">Classmates</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="gallery.html">Gallery</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <header>
+    <div class="emoji-row">🌸 ✨ 🎀 ✨ 🌸</div>
+    <h1>Grade-10 List</h1>
+    <p>10-Ruby · Gill, Sarveen · Ignacio, Sasha</p>
+  </header>
+
+  <div class="card">
+    <div class="input-group">
+      <div class="name-row">
+        <input type="text" id="inputFirstName" placeholder="First Name" />
+        <input type="text" id="inputLastName"  placeholder="Last Name" />
+      </div>
+      <div class="select-wrapper">
+        <select id="inputSection">
+          <option value="">Select Section</option>
+          <option value="Ruby">Ruby</option>
+          <option value="Emerald">Emerald</option>
+          <option value="Topaz">Topaz</option>
+        </select>
+      </div>
+      <div class="select-wrapper">
+        <select id="inputSubject">
+          <option value="">Select Favorite Subject</option>
+          <option value="Mathematics">Mathematics</option>
+          <option value="English">English</option>
+          <option value="Science">Science</option>
+          <option value="Filipino">Filipino</option>
+          <option value="Social Studies">Social Studies</option>
+          <option value="Music">Music</option>
+          <option value="PE">PE</option>
+          <option value="ICT">ICT</option>
+          <option value="TLE">TLE</option>
+          <option value="CAT">CAT</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-add"  onclick="addClassmate()">Add Classmate</button>
+      <button class="btn-show" onclick="renderList()">Show List</button>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <h2>🎀 Classmate List</h2>
+    <div id="classmateList"></div>
+  </div>
+
+</div>
+
+<footer>© 2025–2026 10-Ruby · All rights reserved 🎀</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  class Classmate {
+    constructor(first_name, last_name, section, favorite_subject) {
+      this.first_name = first_name;
+      this.last_name  = last_name;
+      this.section = section;
+      this.favorite_subject = favorite_subject;
+    }
+    get fullName() { return `${this.first_name} ${this.last_name}`; }
+    introduce() {
+      return `Hi! I am ${this.fullName} from ${this.section}. My favorite subject is ${this.favorite_subject}.`;
+    }
+  }
+
+  const classmates = [
+    new Classmate("Sarveen", "Gill",    "Ruby", "Mathematics"),
+    new Classmate("Sasha",   "Ignacio", "Ruby", "PE"),
+    new Classmate("Enya",    "Flores",  "Ruby", "English"),
+    new Classmate("Nicolle", "Tomas",   "Ruby", "Social Studies"),
+    new Classmate("Calev",   "Mendez",  "Ruby", "ICT"),
+  ];
+
+  function renderList() {
+    const container = document.getElementById("classmateList");
+    container.innerHTML = "";
+    classmates.forEach(c => {
+      const div = document.createElement("div");
+      div.className = "classmate-item";
+      div.textContent = c.introduce();
+      container.appendChild(div);
+    });
+  }
+
+  function addClassmate() {
+    const firstName = document.getElementById("inputFirstName").value.trim();
+    const lastName  = document.getElementById("inputLastName").value.trim();
+    const section   = document.getElementById("inputSection").value;
+    const subject   = document.getElementById("inputSubject").value;
+    if (!firstName || !lastName || !section || !subject) {
+      showToast("Please fill in all fields! 🌸"); return;
+    }
+    classmates.push(new Classmate(firstName, lastName, section, subject));
+    document.getElementById("inputFirstName").value = "";
+    document.getElementById("inputLastName").value  = "";
+    document.getElementById("inputSection").value   = "";
+    document.getElementById("inputSubject").value   = "";
+    showToast(`${firstName} ${lastName} has been added! ✨`);
+    renderList();
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById("toast");
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2500);
+  }
+
+  renderList();
+</script>
+</body>
+</html>
